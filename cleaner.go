@@ -37,9 +37,16 @@ func (c *cleaner) Apply(value interface{}) interface{} {
 
 // creates new cleaner, whiteList must contains path to allowed object properties
 func NewCleaner(whiteList []string) Cleaner {
+	allAvailable := false
+	for _, path := range whiteList {
+		if path == WildcardMatching {
+			allAvailable = true
+			break
+		}
+	}
 	return &cleaner{
 		wl:           whiteList,
-		allAvailable: isWildcard(whiteList),
+		allAvailable: allAvailable,
 		m:            compile(whiteList),
 	}
 }

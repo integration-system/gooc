@@ -45,6 +45,10 @@ Result:
   "v": [{"i": "i"}, {"i": "i"}]
 }
 ```
+## Notes
+1) Cleaner object is thread safe
+2) If no properties matches returns `nil`
+3) Use `*` in whitelist to allow all properties from root
 
 ## TODO
 * [ ] Blacklist supporting
