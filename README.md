@@ -1,0 +1,2 @@
+# gooc
+Golang object cleaner
