@@ -58,15 +58,46 @@ func TestCompile(t *testing.T) {
 func TestCleaner_Perform(t *testing.T) {
 	assert := assert.New(t)
 
-	c := NewCleaner([]string{"a.b.c", "a.b", "a.d", "k", "v.i", "j"})
+	c := NewCleaner([]string{"a.b.c", "a.b", "a.d", "k", "v.i", "j"}, nil)
 	res := c.Apply(src)
-	assert.Equal(dst, res)
+	assert.EqualValues(dst, res)
+}
+
+func TestBlackList(t *testing.T) {
+	assert := assert.New(t)
+
+	dst := map[string]interface{}{
+		"a": map[string]interface{}{
+			"b": []interface{}{map[string]interface{}{"c": "c"}},
+			"i": 111,
+			"o": map[string]interface{}{},
+		},
+		"v": []interface{}{
+			map[string]interface{}{"c": "c", "i": "i", "ops": "osp"},
+			map[string]interface{}{"c": "c", "i": "i", "ops": "osp"},
+		},
+	}
+	c := NewCleaner([]string{"*"}, []string{"j", "a.d", "a.b.vvv", "a.b.ops", "k"})
+	res := c.Apply(src)
+	assert.EqualValues(dst, res)
+}
+
+func TestAllMatchBlackList(t *testing.T) {
+	assert := assert.New(t)
+
+	c := NewCleaner([]string{"a.b.c", "a.b", "a.d", "k", "v.i", "j"}, []string{"*"})
+	res := c.Apply(src)
+	assert.Nil(res)
+
+	c = NewCleaner([]string{"*"}, []string{"*", "ignore_it"})
+	res = c.Apply(src)
+	assert.Nil(res)
 }
 
 func TestCleaner_PerformEmpty(t *testing.T) {
 	assert := assert.New(t)
 
-	c := NewCleaner([]string{})
+	c := NewCleaner([]string{}, nil)
 	res := c.Apply(src)
 	assert.Nil(res)
 }
@@ -74,16 +105,15 @@ func TestCleaner_PerformEmpty(t *testing.T) {
 func TestCleaner_PerformAllMatch(t *testing.T) {
 	assert := assert.New(t)
 
-	c := NewCleaner(AllMatch)
+	c := NewCleaner(AllMatch, nil)
 	res := c.Apply(src)
 	assert.EqualValues(src, res)
 }
 
 func BenchmarkCleaner_Perform(b *testing.B) {
-	c := NewCleaner([]string{"a.b.c", "a.b", "a.d", "k", "v.i", "j"})
-	var res interface{}
+	c := NewCleaner([]string{"a.b.c", "a.b", "a.d", "k", "v.i", "j"}, nil)
 	for i := 0; i < b.N; i++ {
-		res = c.Apply(src)
+		_ = c.Apply(src)
 	}
-	res = res
+
 }

@@ -19,35 +19,43 @@ type Cleaner interface {
 
 //default cleaner implementation, thread-safe
 type cleaner struct {
-	wl           []string
-	allAvailable bool
-	m            map[string][]string
+	wlWildcard bool
+	blWildcard bool
+	emptyWl    bool
+	emptyBl    bool
+	compiledWl map[string][]string
+	compiledBl map[string][]string
 }
 
 // sanitize value by compiled spec
 // not mutate original object, but for better performance new objects can contains original pointers to maps and slices
 // works only with maps and slices, return original value otherwise
 func (c *cleaner) Apply(value interface{}) interface{} {
-	if c.allAvailable {
-		return value
+	if c.wlWildcard {
+		if c.emptyBl {
+			return value
+		}
+		if c.blWildcard {
+			return nil
+		}
 	}
 
-	return filter(reflect.ValueOf(value), c.m, make([]string, 0, 3), nil)
+	if c.blWildcard {
+		return nil
+	}
+
+	return c.doClean(reflect.ValueOf(value), make([]string, 0, 3), nil, nil)
 }
 
 // creates new cleaner, whiteList must contains path to allowed object properties
-func NewCleaner(whiteList []string) Cleaner {
-	allAvailable := false
-	for _, path := range whiteList {
-		if path == WildcardMatching {
-			allAvailable = true
-			break
-		}
-	}
+func NewCleaner(whiteList, blackList []string) Cleaner {
 	return &cleaner{
-		wl:           whiteList,
-		allAvailable: allAvailable,
-		m:            compile(whiteList),
+		wlWildcard: hasWildcard(whiteList),
+		blWildcard: hasWildcard(blackList),
+		emptyWl:    len(whiteList) == 0,
+		emptyBl:    len(blackList) == 0,
+		compiledWl: compile(whiteList),
+		compiledBl: compile(blackList),
 	}
 }
 
@@ -73,4 +81,13 @@ func compile(whiteList []string) map[string][]string {
 		}
 	}
 	return m
+}
+
+func hasWildcard(ss []string) bool {
+	for _, path := range ss {
+		if path == WildcardMatching {
+			return true
+		}
+	}
+	return false
 }

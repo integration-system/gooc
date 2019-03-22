@@ -49,7 +49,18 @@ Result:
 1) Cleaner object is thread safe
 2) If no properties matches returns `nil`
 3) Use `*` in whitelist to allow all properties from root
+4) White and black list composition
+* Black list has higher priority than black
+* Some cases:
+
+| Whitelist    | Blacklist    | Result                           |
+|--------------|--------------|----------------------------------|
+| `['*']`      | `['*']`      | No available fields              |
+| `['a', 'b']` | `['*']`      | No available fields              |
+| `['*']`      | `['a', 'b']` | All available except `a` and `b` |
+| `['a', 'b']` | `['b, 'd']`  | Available only `a`               |
+
+
 
 ## TODO
-* [ ] Blacklist supporting
 * [ ] Full object copy option

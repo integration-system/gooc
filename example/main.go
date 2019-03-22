@@ -53,7 +53,7 @@ func main() {
 	}
 
 	wl := []string{"a.b.c", "a.b", "a.d", "k", "v.i", "j"}
-	c := gooc.NewCleaner(wl)
+	c := gooc.NewCleaner(wl, nil)
 	result := c.Apply(m)
 
 	bytes, err := json.MarshalIndent(result, "", "  ")
