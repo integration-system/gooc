@@ -30,7 +30,7 @@ Source data:
 ```
 ```go
 wl := []string{"a.b.c", "a.b", "a.d", "k", "v.i", "j"}
-c := gooc.NewCleaner(wl)
+c := gooc.NewCleaner(wl, nill)
 result := c.Apply(m)
 ```
 Result:
@@ -50,7 +50,7 @@ Result:
 2) If no properties matches returns `nil`
 3) Use `*` in whitelist to allow all properties from root
 4) White and black list composition
-* Black list has higher priority than black
+* 'Black' list has higher priority than 'white'
 * Some cases:
 
 | Whitelist    | Blacklist    | Result                           |
