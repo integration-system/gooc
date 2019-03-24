@@ -30,7 +30,7 @@ Source data:
 ```
 ```go
 wl := []string{"a.b.c", "a.b", "a.d", "k", "v.i", "j"}
-c := gooc.NewCleaner(wl, nill)
+c := gooc.NewCleaner(wl, nil)
 result := c.Apply(m)
 ```
 Result:
